@@ -31,7 +31,7 @@ server.get('/api/users/:id', (req, res) => {
         })
         .catch(error => {
             res.json(error);
-        })
+        });
 });
 
 server.post('/api/users', (req, res) => {
@@ -50,9 +50,17 @@ server.post('/api/users', (req, res) => {
 );
 
 server.put('/api/users/:id', (req, res) => {
-    User.update(req.params.id, req.body)
+    const { id } = req.params;
+    const { name, bio } = req.body;
+    if (!name || !bio ) {
+        res.status(404).json('Must provide Name and Bio')
+    }
+    User.update(id, {name, bio })
         .then(data => {
-            res.status(200).json(data);
+            if (data == 0) {
+                res.status(404).json(`The user with id ${id} does not exist`);
+            }
+            res.status(200).json(`User ${id} updated`);
         })
         .catch(error => {
             res.json(error);
